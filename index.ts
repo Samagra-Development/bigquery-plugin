@@ -214,7 +214,6 @@ export async function exportEventsToBigQuery(events: PluginEvent[], { global, co
 
         const start = Date.now()
         await __sync_new_fields(eventFields, global, config); // sync new keys
-        console.log("All Rows: ", rows);
         await global.bigQueryTable.insert(rows, insertOptions);
         const end = Date.now() - start
 
@@ -306,7 +305,6 @@ export const onEvent: BigQueryPlugin['onEvent'] = (event, { global }) => {
 }
 
 async function __sync_new_fields(eventFields: TableField[], global: any, config: any): Promise<void> {
-    console.log('Global fields Array:', global.bigQueryTableFields);
     console.log('latestSchema Array:', latestSchema);
     try {
         if (JSON.stringify(latestSchema) === '{}') {
@@ -387,13 +385,28 @@ async function __sync_new_fields(eventFields: TableField[], global: any, config:
 }
 
 function __flatten_object(obj: any) {
-    let result: any = {}
+    let result: any = {};
     for (const i in obj) {
-        if (!obj.hasOwnProperty(i)) continue;
         if ((typeof obj[i]) === 'object' && !Array.isArray(obj[i])) {
             const temp = __flatten_object(obj[i])
             for (const j in temp) {
                 result[(i + '__' + j).replace(/\$/g, '')] = Array.isArray(temp[j]) ? JSON.stringify(temp[j]) : temp[j]
+            }
+        } else if (Array.isArray(obj[i])) {
+            let cDataFound = false;
+            let resultedArray: any = {};
+            const temp = __flatten_object(obj[i]);
+            for (const k in temp) {
+                const key = (i + '__' + k).replace(/\$/g, '');
+                if (key.includes('cdata')) {
+                    cDataFound = true;
+                }
+                resultedArray[key] = Array.isArray(temp[k]) ? JSON.stringify(temp[k]) : temp[k]
+            }
+            if (cDataFound) {
+                result = {...result, ...resultedArray}
+            } else {
+                result[i.replace(/\$/, '')] = Array.isArray(obj[i]) ? JSON.stringify(obj[i]) : obj[i]
             }
         } else {
             result[i.replace(/\$/, '')] = Array.isArray(obj[i]) ? JSON.stringify(obj[i]) : obj[i]
