@@ -368,6 +368,7 @@ async function __sync_new_fields(eventFields: TableField[], global: any, config:
     } catch (error) {
         // some other error? abort!
         if (!error.message.includes('Not found')) {
+            console.log('Error while syncing the table schema', error, error.errors, error.toString())
             throw new Error(error)
         }
         console.log(`Creating BigQuery Table - ${config.datasetId}:${config.tableId}`)
