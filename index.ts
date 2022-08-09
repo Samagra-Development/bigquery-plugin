@@ -312,7 +312,7 @@ async function __sync_new_fields(eventFields: TableField[], global: any, config:
         if (JSON.stringify(latestSchema) === '{}') {
             // we'll fetch schema details from metadata for the first time
             const [metadata]: TableMetadata[] = await global.bigQueryTable.getMetadata()
-            if (!metadata.schema || !metadata.schema.fields) {
+            if (!metadata || !metadata.schema || !metadata.schema.fields) {
                 // noinspection ExceptionCaughtLocallyJS
                 throw new Error('Can not get metadata for table. Please check if the table schema is defined.')
             }
@@ -337,7 +337,7 @@ async function __sync_new_fields(eventFields: TableField[], global: any, config:
 
             // since there are new fields to add, let's fetch the metadata to sync new fields
             const [metadata]: TableMetadata[] = await global.bigQueryTable.getMetadata()
-            if (!metadata.schema || !metadata.schema.fields) {
+            if (!metadata || !metadata.schema || !metadata.schema.fields) {
                 // noinspection ExceptionCaughtLocallyJS
                 throw new Error('Can not get metadata for table. Please check if the table schema is defined.')
             }
