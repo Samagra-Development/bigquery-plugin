@@ -217,7 +217,9 @@ export async function exportEventsToBigQuery(events: PluginEvent[], { global, co
     } catch (error) {
         console.error(
             `Error inserting ${events.length} ${events.length > 1 ? 'events' : 'event'} into BigQuery: `,
-            error
+            error,
+            error.message,
+            error.errors
         )
         throw new RetryError(`Error inserting into BigQuery! ${JSON.stringify(error.errors)}`)
     }
