@@ -165,7 +165,16 @@ export async function exportEventsToBigQuery(events: PluginEvent[], { global, co
 
             Object.entries(flattenProperties).forEach(([key, value], index) => {
                 if (eventFields.filter(e => e.name === key).length == 0) {
-                    eventFields.push({ name: key, type: 'STRING' })
+                    let type = 'STRING';
+                    switch (typeof value) {
+                        case 'boolean':
+                            type = 'BOOL';
+                            break;
+                        case 'number':
+                            type = 'NUMERIC'
+                            break;
+                    }
+                    eventFields.push({ name: key, type: type })
                     eventFieldKeys.push(key)
                 }
             })
