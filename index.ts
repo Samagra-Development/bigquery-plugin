@@ -205,6 +205,7 @@ export async function exportEventsToBigQuery(events: PluginEvent[], { global, co
 
         const start = Date.now()
         await __sync_new_fields(eventFields, global, config); // sync new keys
+        console.log("All Rows: ", rows);
         await global.bigQueryTable.insert(rows, insertOptions);
         const end = Date.now() - start
 
